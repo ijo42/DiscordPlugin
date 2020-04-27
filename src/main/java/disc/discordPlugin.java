@@ -84,7 +84,7 @@ public class discordPlugin extends Plugin{
             TextChannel tc = this.getTextChannel(data.getString("live_chat_channel_id"));
             if (tc != null) {
                 Events.on(EventType.PlayerChatEvent.class, event -> {
-                    tc.sendMessage(event.player.name + " *@mindustry* : " + event.message);
+                    tc.sendMessage("**" + event.player.name.replace('*', '+') + "**: " + event.message);
                 });
             }
         }
@@ -180,7 +180,7 @@ public class discordPlugin extends Plugin{
                             if (args.length > 1) {
                                 new MessageBuilder()
                                         .setEmbed(new EmbedBuilder()
-                                                .setTitle("Griefer online")
+                                                .setTitle("Potential griefer online")
                                                 .setDescription(r.getMentionTag())
                                                 .addField("name", found.name)
                                                 .addField("reason", args[1])
@@ -190,7 +190,7 @@ public class discordPlugin extends Plugin{
                             } else {
                                 new MessageBuilder()
                                         .setEmbed(new EmbedBuilder()
-                                                .setTitle("Griefer online")
+                                                .setTitle("Potential griefer online")
                                                 .setDescription(r.getMentionTag())
                                                 .addField("name", found.name)
                                                 .setColor(Color.ORANGE)

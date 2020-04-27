@@ -26,12 +26,17 @@ public class comCommands implements MessageCreateListener {
         //playerlist
         else if (event.getMessageContent().equalsIgnoreCase("..players")){
             StringBuilder lijst = new StringBuilder();
+            StringBuilder admins = new StringBuilder();
             lijst.append("players: " + Vars.playerGroup.size()+"\n");
-            //lijst.append("online admins: " + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
+            admins.append("online admins: ");// + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
             for (Player p :Vars.playerGroup.all()){
-                lijst.append("* " + p.name.trim() + "\n");
+                if (p.isAdmin){
+                    admins.append("* " + p.name.trim() + "\n");
+                } else {
+                    lijst.append("* " + p.name.trim() + "\n");
+                }
             }
-            new MessageBuilder().appendCode("", lijst.toString()).send(event.getChannel());
+            new MessageBuilder().appendCode("", lijst.toString() + admins.toString()).send(event.getChannel());
         }
         //info
         else if (event.getMessageContent().equalsIgnoreCase("..info")){
