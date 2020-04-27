@@ -2,12 +2,14 @@ package disc.command;
 
 import arc.Core;
 import arc.Events;
+import disc.CommandsConstants;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.json.JSONObject;
@@ -28,8 +30,8 @@ public class ServerCommands implements MessageCreateListener {
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        if (event.getMessageContent().equalsIgnoreCase("..gameover")) {
-            if (!data.has("gameOver_role_id")){
+        if (event.getMessageContent().equalsIgnoreCase(CommandsConstants.GameOverCommand)) {
+            if (!data.has("gameOver_role_id")) {
                 if (event.isPrivateMessage()) return;
                 event.getChannel().sendMessage(commandDisabled);
                 return;
@@ -37,13 +39,12 @@ public class ServerCommands implements MessageCreateListener {
             Role r = getRole(event.getApi(), data.getString("gameOver_role_id"));
 
             if (!hasPermission(r, event)) return;
-            // ------------ has permission --------------
             if (Vars.state.is(GameState.State.menu)) {
                 return;
             }
             Events.fire(new EventType.GameOverEvent(Team.crux));
 
-        } else if (event.getMessageContent().startsWith("..exit")) {
+        } else if (event.getMessageContent().startsWith(CommandsConstants.CloseServerCommand)) {
             if (!data.has("closeServer_role_id")) {
                 if (event.isPrivateMessage()) return;
                 event.getChannel().sendMessage(commandDisabled);
@@ -54,15 +55,7 @@ public class ServerCommands implements MessageCreateListener {
 
             Vars.net.dispose(); //todo: check
             Core.app.exit();
-
-        //testing
-        //} else if (event.getMessageContent().startsWith("..test")){
-
         }
-    }
-
-    public void testhallo(byte[] a){
-        System.out.println("done");
     }
 
     public Role getRole(DiscordApi api, String id){
@@ -80,7 +73,7 @@ public class ServerCommands implements MessageCreateListener {
                 if (event.isPrivateMessage()) return false;
                 event.getChannel().sendMessage(commandDisabled);
                 return false;
-            } else if (!event.getMessageAuthor().asUser().get().getRoles(event.getServer().get()).contains(r)) {
+            } else if (hasRole(r, event)) {
                 if (event.isPrivateMessage()) return false;
                 event.getChannel().sendMessage(noPermission);
                 return false;
@@ -92,5 +85,11 @@ public class ServerCommands implements MessageCreateListener {
         }
     }
 
-
+    private boolean hasRole(Role r, MessageCreateEvent event) {
+        if ((event.getMessageAuthor().asUser().isPresent() && event.getServer().isPresent())) {
+            User user = event.getMessageAuthor().asUser().get();
+            return !user.getRoles(event.getServer().get()).contains(r);
+        } else
+            return false;
+    }
 }
