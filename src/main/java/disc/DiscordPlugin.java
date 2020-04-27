@@ -25,19 +25,17 @@ import java.util.Optional;
 
 public class DiscordPlugin extends Plugin {
     private final Long CDT = 300L;
-    private JSONObject data; //token, channel_id, role_id
+    private JSONObject data;
     private DiscordApi api = null;
     private HashMap<Long, String> cooldowns = new HashMap<>(); //uuid
 
-    //register event handlers and create variables in the constructor
     public DiscordPlugin() {
         JSONObject cfg;
         try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
             cfg = new JSONObject(new JSONTokener(pureJson));
             if (!cfg.has("in-game")) {
-                System.out.println("[ERR!] discordplugin: settings.json has an invalid format!\n");
-                //this.makeSettingsFile("settings.json");
+                System.out.println("[ERR!] DiscordPlugin: settings.json имеет неизвестный формат!\n");
                 return;
             } else {
                 data = cfg.getJSONObject("in-game");
@@ -45,11 +43,11 @@ public class DiscordPlugin extends Plugin {
         } catch (Exception e) {
             String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
             if (e.getMessage().contains(fileNotFoundErrorMessage)) {
-                System.out.println("[ERR!] discordplugin: settings.json file is missing.\nBot can't start.");
+                System.out.println("[ERR!] DiscordPlugin: settings.json файл не найден.\nБот не может стартовать.");
                 //this.makeSettingsFile("settings.json");
                 return;
             } else {
-                System.out.println("[ERR!] discordplugin: Init Error");
+                System.out.println("[ERR!] DiscordPlugin: Init Error");
                 e.printStackTrace();
                 return;
             }
@@ -58,7 +56,7 @@ public class DiscordPlugin extends Plugin {
             api = new DiscordApiBuilder().setToken(cfg.getString("token")).login().join();
         }catch (Exception e){
             if (e.getMessage().contains("READY packet")){
-                System.out.println("\n[ERR!] discordplugin: invalid token.\n");
+                System.out.println("\n[ERR!] DiscordPlugin: Токен не валидный.\n");
             } else {
                 e.printStackTrace();
             }
@@ -86,43 +84,41 @@ public class DiscordPlugin extends Plugin {
     @Override
     public void registerClientCommands(CommandHandler handler){
         if (api != null) {
-            handler.<Player>register("d", "<text...>", "Sends a message to discord.", (args, player) -> {
+            handler.<Player>register("d", "<текст>", "Отправить сообщение в Discord", (args, player) -> {
 
                 if (!data.has("dchannel_id")) {
-                    player.sendMessage("[scarlet]This command is disabled.");
+                    player.sendMessage("[scarlet]Эта команда отключена.");
                 } else {
                     TextChannel tc = this.getTextChannel(data.getString("dchannel_id"));
                     if (tc == null) {
-                        player.sendMessage("[scarlet]This command is disabled.");
+                        player.sendMessage("[scarlet]Эта команда отключена.");
                         return;
+
                     }
-                    tc.sendMessage(player.name + " *@mindustry* : " + args[0]);
-                    Call.sendMessage(player.name + "[sky] to @discord[]: " + args[0]);
+                    tc.sendMessage(player.name + " *@mindustry* : " + args[ 0 ]);
+                    Call.sendMessage(player.name + "[sky] в @discord[]: " + args[ 0 ]);
                 }
 
             });
 
-            handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
-                //https://github.com/Anuken/Mindustry/blob/master/core/src/io/anuke/mindustry/core/NetServer.java#L300-L351
+            handler.<Player>register("gr", "[id] [причина]", "Создать репорт на грифера по id (используйте '/gr' что бы получить список id)", (args, player) -> {
                 if (!(data.has("channel_id") && data.has("role_id"))) {
-                    player.sendMessage("[scarlet]This command is disabled.");
+                    player.sendMessage("[scarlet]Эта команда отключена");
                     return;
                 }
-
-                //if (true) return; //some things broke in arc and or Vars.playergroup
 
                 for (Long key : cooldowns.keySet()) {
                     if (key + CDT < System.currentTimeMillis() / 1000L) {
                         cooldowns.remove(key);
                     } else if (player.uuid.equals(cooldowns.get(key))) {
-                        player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
+                        player.sendMessage("[scarlet]Эта команда имеет 5 минутный кулдаун!");
                         return;
                     }
                 }
 
                 if (args.length == 0) {
                     StringBuilder builder = new StringBuilder();
-                    builder.append("[orange]List or reportable players: \n");
+                    builder.append("[orange]Доступные для репорта: \n");
                     for (Player p : Vars.playerGroup.all()) {
                         if (p.isAdmin || p.con == null) continue;
 
@@ -133,7 +129,6 @@ public class DiscordPlugin extends Plugin {
                     Player found = null;
                     if (args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
                         int id = Strings.parseInt(args[0].substring(1));
-                        //found = Vars.playerGroup.find(p -> p.id == id);
                         for (Player p: Vars.playerGroup.all()){
                             if (p.id == id){
                                 found = p;
@@ -147,46 +142,39 @@ public class DiscordPlugin extends Plugin {
                                 break;
                             }
                         }
-                        //found = Vars.playerGroup.find(p -> p.name.equalsIgnoreCase(args[0]));
                     }
                     if (found != null) {
-                        if (found.isAdmin) {
-                            player.sendMessage("[scarlet]Did you really expect to be able to report an admin?");
-                        } else if (found.getTeam() != player.getTeam()) {
-                            player.sendMessage("[scarlet]Only players on your team can be reported.");
-                        } else {
-                            TextChannel tc = this.getTextChannel(data.getString("channel_id"));
-                            Role r = this.getRole(data.getString("role_id"));
-                            if (tc == null || r == null) {
-                                player.sendMessage("[scarlet]This command is disabled.");
-                                return;
-                            }
-                            //send message
-                            if (args.length > 1) {
-                                new MessageBuilder()
-                                        .setEmbed(new EmbedBuilder()
-                                                .setTitle("Potential griefer online")
-                                                .setDescription(r.getMentionTag())
-                                                .addField("name", found.name)
-                                                .addField("reason", args[1])
-                                                .setColor(Color.ORANGE)
-                                                .setFooter("Reported by " + player.name))
-                                        .send(tc);
-                            } else {
-                                new MessageBuilder()
-                                        .setEmbed(new EmbedBuilder()
-                                                .setTitle("Potential griefer online")
-                                                .setDescription(r.getMentionTag())
-                                                .addField("name", found.name)
-                                                .setColor(Color.ORANGE)
-                                                .setFooter("Reported by " + player.name))
-                                        .send(tc);
-                            }
-                            Call.sendMessage(found.name + "[sky] is reported to discord.");
-                            cooldowns.put(System.currentTimeMillis() / 1000L, player.uuid);
+                        TextChannel tc = this.getTextChannel(data.getString("channel_id"));
+                        Role r = this.getRole(data.getString("role_id"));
+                        if (tc == null || r == null) {
+                            player.sendMessage("[scarlet]Эта команда отключена");
+                            return;
                         }
+                        //send message
+                        if (args.length > 1) {
+                            new MessageBuilder()
+                                    .setEmbed(new EmbedBuilder()
+                                            .setTitle("Потенциальный грифер онлайн")
+                                            .setDescription(r.getMentionTag())
+                                            .addField("Имя ", found.name)
+                                            .addField("Причина ", args[ 1 ])
+                                            .setColor(Color.ORANGE)
+                                            .setFooter("Отправлено " + player.name))
+                                    .send(tc);
+                        } else {
+                            new MessageBuilder()
+                                    .setEmbed(new EmbedBuilder()
+                                            .setTitle("Потенциальный грифер онлайн")
+                                            .setDescription(r.getMentionTag())
+                                            .addField("Имя ", found.name)
+                                            .setColor(Color.ORANGE)
+                                            .setFooter("Отправлено " + player.name))
+                                    .send(tc);
+                        }
+                        Call.sendMessage(found.name + "[sky] заявка отправлена.");
+                        cooldowns.put(System.currentTimeMillis() / 1000L, player.uuid);
                     } else {
-                        player.sendMessage("[scarlet]No player[orange] '" + args[0] + "'[scarlet] found.");
+                        player.sendMessage("[scarlet]Игрок[orange] '" + args[ 0 ] + "'[scarlet] не найден.");
                     }
                 }
             });
@@ -196,12 +184,12 @@ public class DiscordPlugin extends Plugin {
     public TextChannel getTextChannel(String id){
         Optional<Channel> dc = this.api.getChannelById(id);
         if (!dc.isPresent()) {
-            System.out.println("[ERR!] discordplugin: channel not found!");
+            System.out.println("[ERR!] DiscordPlugin: Текстовый Канал не найден!");
             return null;
         }
         Optional<TextChannel> dtc = dc.get().asTextChannel();
         if (!dtc.isPresent()){
-            System.out.println("[ERR!] discordplugin: textchannel not found!");
+            System.out.println("[ERR!] DiscordPlugin: Текстовый Канал не найден!");
             return null;
         }
         return dtc.get();
@@ -210,7 +198,7 @@ public class DiscordPlugin extends Plugin {
     public Role getRole(String id){
         Optional<Role> r1 = this.api.getRoleById(id);
         if (!r1.isPresent()) {
-            System.out.println("[ERR!] discordplugin: adminrole not found!");
+            System.out.println("[ERR!] DiscordPlugin: Admin Роль Не найдена!");
             return null;
         }
         return r1.get();

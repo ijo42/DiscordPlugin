@@ -18,13 +18,12 @@ import java.util.Optional;
 
 
 public class ServerCommands implements MessageCreateListener {
-    final String commandDisabled = "This command is disabled.";
-    final String noPermission = "You don't have permissions to use this command!";
+    final String commandDisabled = "Эта команда отключена.";
+    final String noPermission = "У Вас не хватает прав для этого!";
 
     private JSONObject data;
 
-
-    public ServerCommands(JSONObject _data){
+    public ServerCommands(JSONObject _data) {
         this.data = _data;
     }
 
@@ -61,7 +60,7 @@ public class ServerCommands implements MessageCreateListener {
     public Role getRole(DiscordApi api, String id){
         Optional<Role> r1 = api.getRoleById(id);
         if (!r1.isPresent()) {
-            System.out.println("[ERR!] discordplugin: role not found!");
+            System.out.println("[ERR!] DiscordPlugin: Роль не найдена!");
             return null;
         }
         return r1.get();

@@ -18,14 +18,14 @@ public class ComCommands implements MessageCreateListener {
             //discord -> server
             String[] msg = event.getMessageContent().split(" ", 2);
             if (msg.length < 2)
-                Call.sendMessage("\nUse " + CommandsConstants.ChatCommand + " [text]");
+                Call.sendMessage("\nИспользуйте " + CommandsConstants.ChatCommand + " [текст]");
             else
                 Call.sendMessage("[sky]" + event.getMessageAuthor().getName() + " @discord >[] " + msg[ 1 ].trim());
         } else if (event.getMessageContent().equalsIgnoreCase(CommandsConstants.PlayersCommand)) {
             StringBuilder lijst = new StringBuilder();
             StringBuilder admins = new StringBuilder();
-            lijst.append("players: ").append(Vars.playerGroup.size()).append("\n");
-            admins.append("online admins: ").append(Vars.playerGroup.all().count(p -> p.isAdmin)).append("\n");
+            lijst.append("Игроки: ").append(Vars.playerGroup.size()).append("\n");
+            admins.append("Админов онлайн: ").append(Vars.playerGroup.all().count(p -> p.isAdmin)).append("\n");
             for (Player p : Vars.playerGroup.all()) {
                 if (p.isAdmin) {
                     admins.append("* ").append(p.name.trim()).append("\n");
@@ -37,12 +37,12 @@ public class ComCommands implements MessageCreateListener {
         } else if (event.getMessageContent().equalsIgnoreCase(CommandsConstants.InfoCommand)) {
             try {
                 String lijst =
-                        "map: " + Vars.world.getMap().name() + "\n" +
-                                "author: " + Vars.world.getMap().author() + "\n" +
-                                "wave: " + Vars.state.wave + "\n" +
-                                "enemies: " + Vars.state.enemies + "\n" +
-                                "players: " + Vars.playerGroup.size() + '\n' +
-                                "admins online: " + Vars.playerGroup.all().count(p -> p.isAdmin);
+                        "Карта: " + Vars.world.getMap().name() + "\n" +
+                                "Автор: " + Vars.world.getMap().author() + "\n" +
+                                "Волна: " + Vars.state.wave + "\n" +
+                                "Врагов: " + Vars.state.enemies + "\n" +
+                                "Игроков: " + Vars.playerGroup.size() + '\n' +
+                                "Админов онлайн: " + Vars.playerGroup.all().count(p -> p.isAdmin);
                 new MessageBuilder().appendCode("", lijst).send(event.getChannel());
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -50,23 +50,23 @@ public class ComCommands implements MessageCreateListener {
             }
         } else if (event.getMessageContent().equalsIgnoreCase(CommandsConstants.ResourceInfoCommand)) {
             if (!Vars.state.rules.waves) {
-                event.getChannel().sendMessage("Only available when playing survivalmode!");
+                event.getChannel().sendMessage("Доступно только для режима Survival!");
             } else if (Vars.playerGroup.isEmpty()) {
-                event.getChannel().sendMessage("No players online!");
+                event.getChannel().sendMessage("Нет игроков онлайн :(");
             } else {
                 ItemModule core = Vars.playerGroup.all().get(0).getClosestCore().items;
                 String lijst =
-                        "amount of items in the core\n\n" +
-                                "copper: " + core.get(Items.copper) + "\n" +
-                                "lead: " + core.get(Items.lead) + "\n" +
-                                "graphite: " + core.get(Items.graphite) + "\n" +
-                                "metaglass: " + core.get(Items.metaglass) + "\n" +
-                                "titanium: " + core.get(Items.titanium) + "\n" +
-                                "thorium: " + core.get(Items.thorium) + "\n" +
-                                "silicon: " + core.get(Items.silicon) + "\n" +
-                                "plastanium: " + core.get(Items.plastanium) + "\n" +
-                                "phase fabric: " + core.get(Items.phasefabric) + "\n" +
-                                "surge alloy: " + core.get(Items.surgealloy) + "\n";
+                        "Предметы в ядре\n\n" +
+                                "Медь: " + core.get(Items.copper) + "\n" +
+                                "Свинец: " + core.get(Items.lead) + "\n" +
+                                "Графит: " + core.get(Items.graphite) + "\n" +
+                                "Метастекло: " + core.get(Items.metaglass) + "\n" +
+                                "Титаниум: " + core.get(Items.titanium) + "\n" +
+                                "Ториум: " + core.get(Items.thorium) + "\n" +
+                                "Кремний: " + core.get(Items.silicon) + "\n" +
+                                "Пластан: " + core.get(Items.plastanium) + "\n" +
+                                "Фазовая Ткань: " + core.get(Items.phasefabric) + "\n" +
+                                "Кинетический Сплав: " + core.get(Items.surgealloy) + "\n";
                 new MessageBuilder().appendCode("", lijst).send(event.getChannel());
             }
         }

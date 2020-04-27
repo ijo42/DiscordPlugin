@@ -27,8 +27,8 @@ import java.util.zip.InflaterInputStream;
 
 public class MapCommands implements MessageCreateListener {
     final long minMapChangeTime = 30L; //30 seconds
-    final String commandDisabled = "This command is disabled.";
-    final String noPermission = "You don't have permissions to use this command!";
+    final String commandDisabled = "Эта команда отключена.";
+    final String noPermission = "У Вас не хватает прав для этого!";
 
     private JSONObject data;
     private long lastMapChange = 0L;
@@ -43,11 +43,11 @@ public class MapCommands implements MessageCreateListener {
         if (event.getMessageContent().equalsIgnoreCase(CommandsConstants.MapsCommand)) {
             Vars.maps.reload();
             StringBuilder mapLijst = new StringBuilder();
-            mapLijst.append("List of available maps:\n");
+            mapLijst.append("Доступных карта:\n");
             for (Map m : Vars.maps.customMaps()) {
                 mapLijst.append("* ").append(m.name()).append("/ ").append(m.width).append(" x ").append(m.height).append("\n");
             }
-            mapLijst.append("Total number of maps: ").append(Vars.maps.customMaps().size);
+            mapLijst.append("Число карт: ").append(Vars.maps.customMaps().size);
             new MessageBuilder().appendCode("", mapLijst.toString()).send(event.getChannel());
 
         } else if (event.getMessageContent().startsWith(CommandsConstants.ChangeMapCommand)) {
@@ -61,7 +61,7 @@ public class MapCommands implements MessageCreateListener {
 
             if (System.currentTimeMillis() / 1000L - this.lastMapChange < this.minMapChangeTime) {
                 if (event.isPrivateMessage()) return;
-                event.getChannel().sendMessage(String.format("This commands has a %d s cooldown.", this.minMapChangeTime));
+                event.getChannel().sendMessage(String.format("Эта команда имеет кулдаун в %dс.", this.minMapChangeTime));
                 return;
             }
 
@@ -72,7 +72,7 @@ public class MapCommands implements MessageCreateListener {
                 for (Map m : Vars.maps.customMaps()) {
                     sb.append(index++).append(" : ").append(m.name()).append("\n");
                 }
-                sb.append("\nUse ").append(CommandsConstants.ChangeMapCommand).append(" <number/name>");
+                sb.append("\nИспользуйте ").append(CommandsConstants.ChangeMapCommand).append(" <number/name>");
                 new MessageBuilder().appendCode("", sb.toString()).send(event.getChannel());
             } else {
                 Map found = null;
@@ -89,7 +89,7 @@ public class MapCommands implements MessageCreateListener {
                     }
                 }
                 if (found == null) {
-                    event.getChannel().sendMessage("Map not found...");
+                    event.getChannel().sendMessage("Карта не найдена");
                     return;
                 }
 
@@ -111,7 +111,7 @@ public class MapCommands implements MessageCreateListener {
                 temp.deleteDirectory();
                 Vars.maps.reload();
 
-                event.getChannel().sendMessage("Next map selected: " + found.name() + "\nThe current map will change in 10 seconds.");
+                event.getChannel().sendMessage("Следущая карта выбрана: " + found.name() + "\nКарта будет изменена через 10 секунд.");
 
                 this.lastMapChange = System.currentTimeMillis() / 1000L;
             }
@@ -133,11 +133,11 @@ public class MapCommands implements MessageCreateListener {
             }
             if (ml.size != 1) {
                 if (event.isPrivateMessage()) return;
-                event.getChannel().sendMessage("You need to add 1 valid .msav file!");
+                event.getChannel().sendMessage("Вам необходимо прикрепить хотя бы один *.msav файл!");
                 return;
             } else if (Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName()).exists()) {
                 if (event.isPrivateMessage()) return;
-                event.getChannel().sendMessage("There is already a map with this name on the server!");
+                event.getChannel().sendMessage("На сервере уже есть карта с таким именем!");
                 return;
             }
             //more custom filename checks possible
@@ -149,7 +149,7 @@ public class MapCommands implements MessageCreateListener {
                 byte[] data = cf.get();
                 if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
                     if (event.isPrivateMessage()) return;
-                    event.getChannel().sendMessage("invalid .msav file!");
+                    event.getChannel().sendMessage("Неизвестный *.msav файл!");
                     return;
                 }
                 fh.writeBytes(cf.get(), false);
@@ -157,7 +157,7 @@ public class MapCommands implements MessageCreateListener {
                 e.printStackTrace();
             }
             Vars.maps.reload();
-            event.getChannel().sendMessage(ml.get(0).getFileName() + " added succesfully!");
+            event.getChannel().sendMessage(ml.get(0).getFileName() + " добавлена успешно!");
 
         } else if (event.getMessageContent().startsWith(CommandsConstants.RemoveMapCommand)) {
             if (!data.has("mapConfig_role_id")) {
@@ -175,7 +175,7 @@ public class MapCommands implements MessageCreateListener {
                 for (Map m : Vars.maps.customMaps()) {
                     sb.append(index++).append(" : ").append(m.name()).append("\n");
                 }
-                sb.append("\nUse ").append(CommandsConstants.RemoveMapCommand).append(" <number/name>");
+                sb.append("\nИспользуйте ").append(CommandsConstants.RemoveMapCommand).append(" <номер/название>");
                 new MessageBuilder().appendCode("", sb.toString()).send(event.getChannel());
             } else {
                 //try number
@@ -193,12 +193,12 @@ public class MapCommands implements MessageCreateListener {
                     }
                 }
                 if (found == null) {
-                    event.getChannel().sendMessage("Map not found...");
+                    event.getChannel().sendMessage("Карта не найдена");
                     return;
                 }
                 Vars.maps.removeMap(found);
                 Vars.maps.reload();
-                event.getChannel().sendMessage("Deleted succesfully: " + found.name());
+                event.getChannel().sendMessage("Успешно удалена: " + found.name());
 
             }
         }
@@ -207,7 +207,7 @@ public class MapCommands implements MessageCreateListener {
     public Role getRole(DiscordApi api, String id){
         Optional<Role> r1 = api.getRoleById(id);
         if (!r1.isPresent()) {
-            System.out.println("[ERR!] discordplugin: role not found!");
+            System.out.println("[ERR!] DiscordPlugin: Роль не найдена!");
             return null;
         }
         return r1.get();

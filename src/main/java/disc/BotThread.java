@@ -46,11 +46,11 @@ public class BotThread extends Thread{
                 if (data.has("serverdown_name")){
                     String serverName = data.getString("serverdown_name");
                     new MessageBuilder()
-                            .append(String.format("%s\nServer %s is down", r.getMentionTag(), ((!serverName.equals("")) ? ("**" + serverName + "**") : "")))
+                            .append(String.format("%s\nСервер %s упал", r.getMentionTag(), ((!serverName.equals("")) ? ("**" + serverName + "**") : "")))
                             .send(tc);
                 } else {
                     new MessageBuilder()
-                            .append(String.format("%s\nServer is down.", r.getMentionTag()))
+                            .append(String.format("%s\nСервер упал.", r.getMentionTag()))
                             .send(tc);
                 }
             }
