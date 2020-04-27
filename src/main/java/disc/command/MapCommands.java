@@ -94,7 +94,8 @@ public class MapCommands implements MessageCreateListener {
                 }
 
                 Fi temp = Core.settings.getDataDirectory().child("maps").child("temp");
-                temp.mkdirs();
+                if (!temp.file().mkdirs())
+                    event.getChannel().sendMessage("Произошла ошибка");
                 for (Map m1 : Vars.maps.customMaps()) {
                     if (m1.equals(Vars.world.getMap())) continue;
                     if (m1.equals(found)) continue;

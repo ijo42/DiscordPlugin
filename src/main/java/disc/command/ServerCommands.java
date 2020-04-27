@@ -72,7 +72,7 @@ public class ServerCommands implements MessageCreateListener {
                 if (event.isPrivateMessage()) return false;
                 event.getChannel().sendMessage(commandDisabled);
                 return false;
-            } else if (hasRole(r, event)) {
+            } else if (!hasRole(r, event)) {
                 if (event.isPrivateMessage()) return false;
                 event.getChannel().sendMessage(noPermission);
                 return false;
@@ -87,7 +87,7 @@ public class ServerCommands implements MessageCreateListener {
     private boolean hasRole(Role r, MessageCreateEvent event) {
         if ((event.getMessageAuthor().asUser().isPresent() && event.getServer().isPresent())) {
             User user = event.getMessageAuthor().asUser().get();
-            return !user.getRoles(event.getServer().get()).contains(r);
+            return user.getRoles(event.getServer().get()).contains(r);
         } else
             return false;
     }
