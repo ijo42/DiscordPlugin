@@ -1,16 +1,14 @@
 package disc;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.util.ArcRuntimeException;
-import io.anuke.arc.util.CommandHandler;
-import io.anuke.arc.util.Strings;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.entities.type.Player;
-import io.anuke.mindustry.game.EventType;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.plugin.Plugin;
-//javacord
+import arc.Core;
+import arc.Events;
+import arc.util.CommandHandler;
+import arc.util.Strings;
+import mindustry.Vars;
+import mindustry.entities.type.Player;
+import mindustry.game.EventType;
+import mindustry.gen.Call;
+import mindustry.plugin.Plugin;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.Channel;
@@ -18,24 +16,14 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
-
-//json
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.json.JSONTokener;
 
 import java.awt.*;
-import java.io.PrintWriter;
-import java.lang.Thread;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Optional;
 
-public class DiscordPlugin extends Plugin{
+public class DiscordPlugin extends Plugin {
     private final Long CDT = 300L;
     private final String FileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     private JSONObject alldata;

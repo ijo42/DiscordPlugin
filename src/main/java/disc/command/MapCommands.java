@@ -1,14 +1,14 @@
 package disc.command;
 
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.game.EventType;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.io.SaveIO;
-import io.anuke.mindustry.maps.Map;
+import arc.Core;
+import arc.Events;
+import arc.files.Fi;
+import arc.struct.Array;
+import mindustry.Vars;
+import mindustry.game.EventType;
+import mindustry.game.Team;
+import mindustry.io.SaveIO;
+import mindustry.maps.Map;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -94,7 +94,7 @@ public class MapCommands implements MessageCreateListener {
                 }
                 ;
 
-                FileHandle temp = Core.settings.getDataDirectory().child("maps").child("temp");
+                Fi temp = Core.settings.getDataDirectory().child("maps").child("temp");
                 temp.mkdirs();
 
                 for (Map m1 : Vars.maps.customMaps()) {
@@ -108,8 +108,8 @@ public class MapCommands implements MessageCreateListener {
                 Events.fire(new EventType.GameOverEvent(Team.crux));
                 //move maps
                 Vars.maps.reload();
-                FileHandle mapsDir = Core.settings.getDataDirectory().child("maps");
-                for (FileHandle fh : temp.list()) {
+                Fi mapsDir = Core.settings.getDataDirectory().child("maps");
+                for (Fi fh : temp.list()) {
                     fh.moveTo(mapsDir);
                 }
                 temp.deleteDirectory();
@@ -151,7 +151,7 @@ public class MapCommands implements MessageCreateListener {
             Role r = getRole(event.getApi(), data.getString("mapConfig_role_id"));
             if (!hasPermission(r, event)) return;
 
-            Array<MessageAttachment> ml = new Array<MessageAttachment>();
+            Array<MessageAttachment> ml = new Array<>();
             for (MessageAttachment ma : event.getMessageAttachments()) {
                 if (ma.getFileName().split("\\.", 2)[1].trim().equals("msav")) {
                     ml.add(ma);
@@ -169,7 +169,7 @@ public class MapCommands implements MessageCreateListener {
             //more custom filename checks possible
 
             CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
-            FileHandle fh = Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName());
+            Fi fh = Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName());
 
             try {
                 byte[] data = cf.get();
