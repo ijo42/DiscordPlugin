@@ -11,25 +11,12 @@ repositories{
 }
 
 ext{
-    //the build number that this plugin is made for
-    mindustryVersion = 'v99'
-    //equals to null
-    arcHash = '7f36ea330f592f43ad01b729c4cae77797476ea7'
-
-    isHash = {
-        return arcHash != null
-    }
+    mindustryVersion = 'v104'
 }
 
 dependencies{
 
-    if (isHash){
-        println "with hash"
-        compileOnly "com.github.Anuken.Arc:arc-core:$arcHash"
-    } else {
-        compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    }
-
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
 
@@ -41,7 +28,6 @@ dependencies{
 
 
 jar{
-    version = null
     from{
         configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
     }

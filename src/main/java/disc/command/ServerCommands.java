@@ -1,51 +1,37 @@
 package disc.command;
 
-import io.anuke.arc.ApplicationListener;
-import io.anuke.arc.Core;
-import io.anuke.arc.Events;
-import io.anuke.arc.collection.Array;
-import io.anuke.arc.files.FileHandle;
-import io.anuke.arc.net.Server;
-import io.anuke.mindustry.game.EventType.*;
-import io.anuke.mindustry.Vars;
-import io.anuke.mindustry.core.GameState;
-import io.anuke.mindustry.game.Team;
-import io.anuke.mindustry.gen.Call;
-import io.anuke.mindustry.maps.Map;
-import io.anuke.mindustry.io.*;
-
+import arc.Core;
+import arc.Events;
+import disc.CommandsConstants;
+import mindustry.Vars;
+import mindustry.core.GameState;
+import mindustry.game.EventType;
+import mindustry.game.Team;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.message.MessageAttachment;
-import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.zip.InflaterInputStream;
 
 
-public class serverCommands implements MessageCreateListener {
+public class ServerCommands implements MessageCreateListener {
     final String commandDisabled = "This command is disabled.";
     final String noPermission = "You don't have permissions to use this command!";
 
     private JSONObject data;
 
 
-    public serverCommands(JSONObject _data){
+    public ServerCommands(JSONObject _data){
         this.data = _data;
     }
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        if (event.getMessageContent().equalsIgnoreCase("..gameover")) {
-            if (!data.has("gameOver_role_id")){
+        if (event.getMessageContent().equalsIgnoreCase(CommandsConstants.GameOverCommand)) {
+            if (!data.has("gameOver_role_id")) {
                 if (event.isPrivateMessage()) return;
                 event.getChannel().sendMessage(commandDisabled);
                 return;
@@ -53,13 +39,12 @@ public class serverCommands implements MessageCreateListener {
             Role r = getRole(event.getApi(), data.getString("gameOver_role_id"));
 
             if (!hasPermission(r, event)) return;
-            // ------------ has permission --------------
             if (Vars.state.is(GameState.State.menu)) {
                 return;
             }
-            Events.fire(new GameOverEvent(Team.crux));
+            Events.fire(new EventType.GameOverEvent(Team.crux));
 
-        } else if (event.getMessageContent().startsWith("..exit")) {
+        } else if (event.getMessageContent().startsWith(CommandsConstants.CloseServerCommand)) {
             if (!data.has("closeServer_role_id")) {
                 if (event.isPrivateMessage()) return;
                 event.getChannel().sendMessage(commandDisabled);
@@ -70,15 +55,7 @@ public class serverCommands implements MessageCreateListener {
 
             Vars.net.dispose(); //todo: check
             Core.app.exit();
-
-        //testing
-        //} else if (event.getMessageContent().startsWith("..test")){
-
         }
-    }
-
-    public void testhallo(byte[] a){
-        System.out.println("done");
     }
 
     public Role getRole(DiscordApi api, String id){
@@ -96,17 +73,23 @@ public class serverCommands implements MessageCreateListener {
                 if (event.isPrivateMessage()) return false;
                 event.getChannel().sendMessage(commandDisabled);
                 return false;
-            } else if (!event.getMessageAuthor().asUser().get().getRoles(event.getServer().get()).contains(r)) {
+            } else if (hasRole(r, event)) {
                 if (event.isPrivateMessage()) return false;
                 event.getChannel().sendMessage(noPermission);
                 return false;
             } else {
                 return true;
             }
-        } catch (Exception _){
+        } catch (Exception ex) {
             return false;
         }
     }
 
-
+    private boolean hasRole(Role r, MessageCreateEvent event) {
+        if ((event.getMessageAuthor().asUser().isPresent() && event.getServer().isPresent())) {
+            User user = event.getMessageAuthor().asUser().get();
+            return !user.getRoles(event.getServer().get()).contains(r);
+        } else
+            return false;
+    }
 }
