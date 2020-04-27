@@ -54,6 +54,7 @@ public class DiscordPlugin extends Plugin {
         }
         try {
             api = new DiscordApiBuilder().setToken(cfg.getString("token")).login().join();
+            api.setMessageCacheSize(1, 30);
         }catch (Exception e){
             if (e.getMessage().contains("READY packet")){
                 System.out.println("\n[ERR!] DiscordPlugin: Токен не валидный.\n");
