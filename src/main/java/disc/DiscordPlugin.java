@@ -25,26 +25,26 @@ import java.util.Optional;
 
 public class DiscordPlugin extends Plugin {
     private final Long CDT = 300L;
-    private final String FileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
-    private JSONObject alldata;
     private JSONObject data; //token, channel_id, role_id
     private DiscordApi api = null;
-    private HashMap<Long, String> cooldowns = new HashMap<Long, String>(); //uuid
+    private HashMap<Long, String> cooldowns = new HashMap<>(); //uuid
 
     //register event handlers and create variables in the constructor
     public DiscordPlugin() {
+        JSONObject cfg;
         try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
-            alldata = new JSONObject(new JSONTokener(pureJson));
-            if (!alldata.has("in-game")){
+            cfg = new JSONObject(new JSONTokener(pureJson));
+            if (!cfg.has("in-game")) {
                 System.out.println("[ERR!] discordplugin: settings.json has an invalid format!\n");
                 //this.makeSettingsFile("settings.json");
                 return;
             } else {
-                data = alldata.getJSONObject("in-game");
+                data = cfg.getJSONObject("in-game");
             }
         } catch (Exception e) {
-            if (e.getMessage().contains(FileNotFoundErrorMessage)){
+            String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
+            if (e.getMessage().contains(fileNotFoundErrorMessage)) {
                 System.out.println("[ERR!] discordplugin: settings.json file is missing.\nBot can't start.");
                 //this.makeSettingsFile("settings.json");
                 return;
@@ -55,7 +55,7 @@ public class DiscordPlugin extends Plugin {
             }
         }
         try {
-            api = new DiscordApiBuilder().setToken(alldata.getString("token")).login().join();
+            api = new DiscordApiBuilder().setToken(cfg.getString("token")).login().join();
         }catch (Exception e){
             if (e.getMessage().contains("READY packet")){
                 System.out.println("\n[ERR!] discordplugin: invalid token.\n");
@@ -63,7 +63,7 @@ public class DiscordPlugin extends Plugin {
                 e.printStackTrace();
             }
         }
-        BotThread bt = new BotThread(api, Thread.currentThread(), alldata.getJSONObject("discord"));
+        BotThread bt = new BotThread(api, Thread.currentThread(), cfg.getJSONObject("discord"));
         bt.setDaemon(false);
         bt.start();
 
@@ -71,9 +71,7 @@ public class DiscordPlugin extends Plugin {
         if (data.has("live_chat_channel_id")) {
             TextChannel tc = this.getTextChannel(data.getString("live_chat_channel_id"));
             if (tc != null) {
-                Events.on(EventType.PlayerChatEvent.class, event -> {
-                    tc.sendMessage("**" + event.player.name.replace('*', '+') + "**: " + event.message);
-                });
+                Events.on(EventType.PlayerChatEvent.class, event -> tc.sendMessage("**" + event.player.name.replace('*', '+') + "**: " + event.message));
             }
         }
     }
@@ -116,8 +114,7 @@ public class DiscordPlugin extends Plugin {
                 for (Long key : cooldowns.keySet()) {
                     if (key + CDT < System.currentTimeMillis() / 1000L) {
                         cooldowns.remove(key);
-                        continue;
-                    } else if (player.uuid == cooldowns.get(key)) {
+                    } else if (player.uuid.equals(cooldowns.get(key))) {
                         player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
                         return;
                     }
@@ -197,7 +194,7 @@ public class DiscordPlugin extends Plugin {
     }
 
     public TextChannel getTextChannel(String id){
-        Optional<Channel> dc =  ((Optional<Channel>)this.api.getChannelById(id));
+        Optional<Channel> dc = this.api.getChannelById(id);
         if (!dc.isPresent()) {
             System.out.println("[ERR!] discordplugin: channel not found!");
             return null;

@@ -4,13 +4,10 @@ import disc.command.ComCommands;
 import disc.command.MapCommands;
 import disc.command.ServerCommands;
 import org.javacord.api.DiscordApi;
-
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.json.JSONObject;
-
-import java.lang.Thread;
 
 public class BotThread extends Thread{
     public DiscordApi api;
@@ -31,9 +28,9 @@ public class BotThread extends Thread{
 
     public void run(){
         while (this.mt.isAlive()){
-            try{
+            try {
                 Thread.sleep(1000);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
         }
@@ -43,12 +40,13 @@ public class BotThread extends Thread{
             if (r == null || tc ==  null) {
                 try {
                     Thread.sleep(1000);
-                } catch (Exception _) {}
+                } catch (Exception ignored) {
+                }
             } else {
                 if (data.has("serverdown_name")){
-                    String serverNaam = data.getString("serverdown_name");
+                    String serverName = data.getString("serverdown_name");
                     new MessageBuilder()
-                            .append(String.format("%s\nServer %s is down",r.getMentionTag(),((serverNaam != "") ? ("**"+serverNaam+"**") : "")))
+                            .append(String.format("%s\nServer %s is down", r.getMentionTag(), ((!serverName.equals("")) ? ("**" + serverName + "**") : "")))
                             .send(tc);
                 } else {
                     new MessageBuilder()

@@ -87,7 +87,7 @@ public class ServerCommands implements MessageCreateListener {
             } else {
                 return true;
             }
-        } catch (Exception _){
+        } catch (Exception ex) {
             return false;
         }
     }

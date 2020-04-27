@@ -43,9 +43,9 @@ public class MapCommands implements MessageCreateListener {
             StringBuilder mapLijst = new StringBuilder();
             mapLijst.append("List of available maps:\n");
             for (Map m : Vars.maps.customMaps()) {
-                mapLijst.append("* " + m.name() + "/ " + m.width + " x " + m.height + "\n");
+                mapLijst.append("* ").append(m.name()).append("/ ").append(m.width).append(" x ").append(m.height).append("\n");
             }
-            mapLijst.append("Total number of maps: " + Vars.maps.customMaps().size);
+            mapLijst.append("Total number of maps: ").append(Vars.maps.customMaps().size);
             new MessageBuilder().appendCode("", mapLijst.toString()).send(event.getChannel());
 
         } else if (event.getMessageContent().startsWith("..changemap")) {
@@ -69,7 +69,7 @@ public class MapCommands implements MessageCreateListener {
                 int index = 1;
                 StringBuilder sb = new StringBuilder();
                 for (Map m : Vars.maps.customMaps()) {
-                    sb.append(index++ + " : " + m.name() + "\n");
+                    sb.append(index++).append(" : ").append(m.name()).append("\n");
                 }
                 sb.append("\nUse ..changemap <number/name>");
                 new MessageBuilder().appendCode("", sb.toString()).send(event.getChannel());
@@ -92,7 +92,6 @@ public class MapCommands implements MessageCreateListener {
                     event.getChannel().sendMessage("Map not found...");
                     return;
                 }
-                ;
 
                 Fi temp = Core.settings.getDataDirectory().child("maps").child("temp");
                 temp.mkdirs();
@@ -200,7 +199,7 @@ public class MapCommands implements MessageCreateListener {
                 int index = 1;
                 StringBuilder sb = new StringBuilder();
                 for (Map m : Vars.maps.customMaps()) {
-                    sb.append(index++ + " : " + m.name() + "\n");
+                    sb.append(index++).append(" : ").append(m.name()).append("\n");
                 }
                 sb.append("\nUse ..removemap <number/name>");
                 new MessageBuilder().appendCode("", sb.toString()).send(event.getChannel());
@@ -254,7 +253,7 @@ public class MapCommands implements MessageCreateListener {
             } else {
                 return true;
             }
-        } catch (Exception _){
+        } catch (Exception ex) {
             return false;
         }
     }
