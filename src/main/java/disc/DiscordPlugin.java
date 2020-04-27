@@ -35,7 +35,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Optional;
 
-public class discordPlugin extends Plugin{
+public class DiscordPlugin extends Plugin{
     private final Long CDT = 300L;
     private final String FileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     private JSONObject alldata;
@@ -44,7 +44,7 @@ public class discordPlugin extends Plugin{
     private HashMap<Long, String> cooldowns = new HashMap<Long, String>(); //uuid
 
     //register event handlers and create variables in the constructor
-    public discordPlugin() {
+    public DiscordPlugin() {
         try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
             alldata = new JSONObject(new JSONTokener(pureJson));

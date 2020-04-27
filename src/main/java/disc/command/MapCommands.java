@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.zip.InflaterInputStream;
 
-public class mapCommands implements MessageCreateListener {
+public class MapCommands implements MessageCreateListener {
     final long minMapChangeTime = 30L; //30 seconds
     final String commandDisabled = "This command is disabled.";
     final String noPermission = "You don't have permissions to use this command!";
@@ -32,7 +32,7 @@ public class mapCommands implements MessageCreateListener {
     private long lastMapChange = 0L;
 
 
-    public mapCommands(JSONObject _data) {
+    public MapCommands(JSONObject _data) {
         this.data = _data;
     }
 

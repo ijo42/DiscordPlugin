@@ -31,14 +31,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.zip.InflaterInputStream;
 
 
-public class serverCommands implements MessageCreateListener {
+public class ServerCommands implements MessageCreateListener {
     final String commandDisabled = "This command is disabled.";
     final String noPermission = "You don't have permissions to use this command!";
 
     private JSONObject data;
 
 
-    public serverCommands(JSONObject _data){
+    public ServerCommands(JSONObject _data){
         this.data = _data;
     }
 

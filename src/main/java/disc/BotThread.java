@@ -1,8 +1,8 @@
 package disc;
 
-import disc.command.comCommands;
-import disc.command.mapCommands;
-import disc.command.serverCommands;
+import disc.command.ComCommands;
+import disc.command.MapCommands;
+import disc.command.ServerCommands;
 import org.javacord.api.DiscordApi;
 
 import org.javacord.api.entity.channel.TextChannel;
@@ -23,10 +23,10 @@ public class BotThread extends Thread{
         data = _data;
 
         //communication commands
-        api.addMessageCreateListener(new comCommands());
+        api.addMessageCreateListener(new ComCommands());
         //server manangement commands
-        api.addMessageCreateListener(new serverCommands(data));
-        api.addMessageCreateListener(new mapCommands(data));
+        api.addMessageCreateListener(new ServerCommands(data));
+        api.addMessageCreateListener(new MapCommands(data));
     }
 
     public void run(){
@@ -38,8 +38,8 @@ public class BotThread extends Thread{
             }
         }
         if (data.has("serverdown_role_id")){
-            Role r = new utilmethods().getRole(api, data.getString("serverdown_role_id"));
-            TextChannel tc = new utilmethods().getTextChannel(api, data.getString("serverdown_channel_id"));
+            Role r = new UtilMethods().getRole(api, data.getString("serverdown_role_id"));
+            TextChannel tc = new UtilMethods().getTextChannel(api, data.getString("serverdown_channel_id"));
             if (r == null || tc ==  null) {
                 try {
                     Thread.sleep(1000);

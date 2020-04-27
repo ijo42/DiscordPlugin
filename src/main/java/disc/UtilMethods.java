@@ -7,7 +7,7 @@ import org.javacord.api.entity.permission.Role;
 
 import java.util.Optional;
 
-public class utilmethods {
+public class UtilMethods {
     public TextChannel getTextChannel(DiscordApi api, String id){
         Optional<Channel> dc =  ((Optional<Channel>)api.getChannelById(id));
         if (!dc.isPresent()) {

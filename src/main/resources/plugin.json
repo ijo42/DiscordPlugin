@@ -1,7 +1,7 @@
 {
   "name": "DiscordPlugin",
   "author": "Fishbuilder",
-  "main": "disc.discordPlugin",
+  "main": "disc.DiscordPlugin",
   "description": "interaction with discord",
   "version": 0.8
 }
